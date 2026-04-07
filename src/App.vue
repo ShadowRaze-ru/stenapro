@@ -1,6 +1,51 @@
 <template>
   <div class="sp-root" itemscope itemtype="https://schema.org/LocalBusiness">
 
+    <teleport to="body">
+      <transition name="modal">
+        <div v-if="quickModalOpen" class="sp-modal-overlay" @click.self="quickModalOpen = false">
+          <div class="sp-modal-card">
+            <button class="sp-modal-close" @click="quickModalOpen = false" aria-label="Закрыть">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            <div class="sp-modal-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.59 1.2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.76a16 16 0 0 0 6 6l1.27-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z" />
+              </svg>
+            </div>
+            <h3>Узнать стоимость</h3>
+            <p>Оставьте контакты — перезвоним и рассчитаем цену за 5 минут</p>
+            <form @submit.prevent="submitQuickForm" novalidate>
+              <div class="sp-modal-field">
+                <label for="qf-name">Ваше имя *</label>
+                <input type="text" id="qf-name" v-model="quickForm.name" placeholder="Иван" required
+                  autocomplete="name" />
+              </div>
+              <div class="sp-modal-field">
+                <label for="qf-phone">Телефон *</label>
+                <input type="tel" id="qf-phone" v-model="quickForm.phone" placeholder="+7 (900) 123-45-67" required
+                  autocomplete="tel" @input="formatQuickPhone" maxlength="18" />
+                <span v-if="quickPhoneError" class="sp-field-error">{{ quickPhoneError }}</span>
+              </div>
+              <div class="sp-form-consent">
+                <input type="checkbox" id="qf-consent" v-model="quickForm.consent" required
+                  class="sp-consent-checkbox" />
+                <label for="qf-consent" class="sp-consent-text">Согласен с обработкой персональных данных</label>
+              </div>
+              <button type="submit" class="sp-btn-blue sp-btn-full" :disabled="isQuickSubmitting">
+                {{ isQuickSubmitting ? 'Отправляем...' : 'Отправить →' }}
+              </button>
+              <p v-if="quickFormMessage" :class="['sp-form-message', quickFormMessageType]" role="alert">{{
+                quickFormMessage }}</p>
+            </form>
+          </div>
+        </div>
+      </transition>
+    </teleport>
 
     <header :class="['sp-header', { scrolled: isScrolled }]" role="banner">
       <div class="sp-container sp-header-inner">
@@ -30,7 +75,7 @@
             </svg>
             Telegram
           </a>
-          <button @click="scrollTo('#contact')" class="sp-btn-blue">Замер</button>
+          <button @click="openQuickModal()" class="sp-btn-blue">Замер</button>
         </div>
         <button class="sp-burger" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen" aria-controls="sp-mobile-menu"
           aria-label="Меню">
@@ -52,6 +97,8 @@
           </svg>
           Написать в Telegram
         </a>
+        <button @click="openQuickModal(); menuOpen = false" class="sp-btn-wa sp-btn-wa-mob"
+          style="border:none;cursor:pointer;">Узнать стоимость</button>
         <button @click="scrollTo('#contact'); menuOpen = false" class="sp-btn-blue sp-mmenu-btn">Получить коммерческое
           предложение</button>
       </div>
@@ -72,7 +119,7 @@
             <div class="sp-hero-btns sp-hero-anim" style="--hi: 3">
               <button @click="scrollTo('#contact')" class="sp-btn-hero-primary">Получить коммерческое предложение
                 →</button>
-              <button @click="scrollTo('#cost')" class="sp-btn-hero-outline">Узнать стоимость</button>
+              <button @click="openQuickModal()" class="sp-btn-hero-outline">Узнать стоимость</button>
             </div>
           </div>
           <div class="sp-hero-right sp-hero-anim" style="--hi: 2">
@@ -98,10 +145,10 @@
                     на работу. Осталось <strong style="color:#fbbf24">3 места</strong> на апрель!</div>
                 </div>
               </div>
-              <button @click="scrollTo('#contact')" class="sp-btn-tg sp-btn-blue sp-btn-full">
+              <button @click="openQuickModal()" class="sp-btn-tg sp-btn-blue sp-btn-full">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                  <polyline points="22,6 12,13 2,6" />
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
                 Написать письмо
               </button>
@@ -275,7 +322,7 @@
                   <span>Ваша выгода:</span>
                   <span>59 500 ₽</span>
                 </div>
-                <button @click="scrollTo('#contact')" class="sp-btn-save">Хочу сэкономить</button>
+                <button @click="openQuickModal()" class="sp-btn-save">Хочу сэкономить</button>
               </div>
             </div>
           </div>
@@ -341,111 +388,145 @@
               <div class="sp-quiz-progress-bar" :style="{ width: progressPercent + '%' }"></div>
             </div>
             <div class="sp-quiz-step-label">
-              <span v-if="quizStep < 5">Шаг {{ quizStep }} из 4</span>
-              <span v-else>Шаг 4 из 4 — Ваши контакты</span>
+              <span v-if="quizStep <= 7">Вопрос {{ quizStep }} из 7</span>
+              <span v-else>Ваши контакты</span>
             </div>
 
             <div v-if="quizStep === 1" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
                 <span class="sp-quiz-step-num">1</span>
-                <span>Ваш проект</span>
+                <span>Тип помещения</span>
               </div>
-
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">1. Какой тип помещения вы строите или ремонтируете?</p>
+                <p class="sp-quiz-q-text">Какой тип помещения вы строите или ремонтируете?</p>
                 <div class="sp-quiz-options">
                   <label v-for="opt in q1options" :key="opt" class="sp-quiz-option"
                     :class="{ selected: quiz.q1 === opt }">
-                    <input type="radio" :value="opt" v-model="quiz.q1" />
+                    <input type="radio" :value="opt" v-model="quiz.q1" @change="autoNext(1, !!quiz.q1)" />
                     <span>{{ opt }}</span>
                   </label>
                 </div>
               </div>
-
-              <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">2. Какова общая площадь перегородок, которые вы планируете возвести
-                  (примерно)?</p>
-                <div class="sp-quiz-options">
-                  <label v-for="opt in q2options" :key="opt" class="sp-quiz-option"
-                    :class="{ selected: quiz.q2 === opt }">
-                    <input type="radio" :value="opt" v-model="quiz.q2" />
-                    <span>{{ opt }}</span>
-                  </label>
-                </div>
-              </div>
-
               <div class="sp-quiz-nav">
-                <button class="sp-btn-blue" @click="nextStep(1)" :disabled="!quiz.q1 || !quiz.q2">Далее →</button>
+                <button class="sp-btn-blue" @click="nextStep(1)" :disabled="!quiz.q1">Далее →</button>
               </div>
             </div>
 
             <div v-if="quizStep === 2" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
                 <span class="sp-quiz-step-num">2</span>
-                <span>Ваши приоритеты</span>
+                <span>Площадь перегородок</span>
               </div>
-
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">3. Что для вас наиболее важно при выборе материала для перегородок?</p>
-                <div class="sp-quiz-options sp-quiz-options-grid">
-                  <label v-for="opt in q3options" :key="opt" class="sp-quiz-option"
-                    :class="{ selected: quiz.q3 === opt }">
-                    <input type="radio" :value="opt" v-model="quiz.q3" />
-                    <span>{{ opt }}</span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">4. Планируете ли вы в дальнейшем вешать на перегородки тяжелые предметы
-                  (полки, телевизоры, шкафы)</p>
+                <p class="sp-quiz-q-text">Какова общая площадь перегородок, которые вы планируете возвести (примерно)?
+                </p>
                 <div class="sp-quiz-options">
-                  <label v-for="opt in q4options" :key="opt" class="sp-quiz-option"
-                    :class="{ selected: quiz.q4 === opt }">
-                    <input type="radio" :value="opt" v-model="quiz.q4" />
+                  <label v-for="opt in q2options" :key="opt" class="sp-quiz-option"
+                    :class="{ selected: quiz.q2 === opt }">
+                    <input type="radio" :value="opt" v-model="quiz.q2" @change="autoNext(2, !!quiz.q2)" />
                     <span>{{ opt }}</span>
                   </label>
                 </div>
               </div>
-
-              <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">5. Насколько важна для вас максимальная звукоизоляция?</p>
-                <div class="sp-quiz-options">
-                  <label v-for="opt in q5options" :key="opt" class="sp-quiz-option"
-                    :class="{ selected: quiz.q5 === opt }">
-                    <input type="radio" :value="opt" v-model="quiz.q5" />
-                    <span>{{ opt }}</span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">6. Планируете ли вы проводить отделку непосредственно по блокам, без
-                  дополнительного выравнивания?</p>
-                <div class="sp-quiz-options">
-                  <label v-for="opt in q6options" :key="opt" class="sp-quiz-option"
-                    :class="{ selected: quiz.q6 === opt }">
-                    <input type="radio" :value="opt" v-model="quiz.q6" />
-                    <span>{{ opt }}</span>
-                  </label>
-                </div>
-              </div>
-
               <div class="sp-quiz-nav">
                 <button class="sp-quiz-btn-back" @click="quizStep = 1">← Назад</button>
-                <button class="sp-btn-blue" @click="nextStep(2)"
-                  :disabled="!quiz.q3 || !quiz.q4 || !quiz.q5 || !quiz.q6">Далее →</button>
+                <button class="sp-btn-blue" @click="nextStep(2)" :disabled="!quiz.q2">Далее →</button>
               </div>
             </div>
 
             <div v-if="quizStep === 3" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
                 <span class="sp-quiz-step-num">3</span>
-                <span>Ваш бюджет</span>
+                <span>Приоритет при выборе</span>
               </div>
-
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">7. Каков ваш примерный бюджет на материалы для перегородок (за м²)?</p>
+                <p class="sp-quiz-q-text">Что для вас наиболее важно при выборе материала для перегородок?</p>
+                <div class="sp-quiz-options sp-quiz-options-grid">
+                  <label v-for="opt in q3options" :key="opt" class="sp-quiz-option"
+                    :class="{ selected: quiz.q3 === opt }">
+                    <input type="radio" :value="opt" v-model="quiz.q3" @change="autoNext(3, !!quiz.q3)" />
+                    <span>{{ opt }}</span>
+                  </label>
+                </div>
+              </div>
+              <div class="sp-quiz-nav">
+                <button class="sp-quiz-btn-back" @click="quizStep = 2">← Назад</button>
+                <button class="sp-btn-blue" @click="nextStep(3)" :disabled="!quiz.q3">Далее →</button>
+              </div>
+            </div>
+
+            <div v-if="quizStep === 4" class="sp-quiz-block">
+              <div class="sp-quiz-step-title">
+                <span class="sp-quiz-step-num">4</span>
+                <span>Навесные предметы</span>
+              </div>
+              <div class="sp-quiz-question">
+                <p class="sp-quiz-q-text">Планируете ли вы вешать на перегородки тяжелые предметы (полки, телевизоры,
+                  шкафы)?</p>
+                <div class="sp-quiz-options">
+                  <label v-for="opt in q4options" :key="opt" class="sp-quiz-option"
+                    :class="{ selected: quiz.q4 === opt }">
+                    <input type="radio" :value="opt" v-model="quiz.q4" @change="autoNext(4, !!quiz.q4)" />
+                    <span>{{ opt }}</span>
+                  </label>
+                </div>
+              </div>
+              <div class="sp-quiz-nav">
+                <button class="sp-quiz-btn-back" @click="quizStep = 3">← Назад</button>
+                <button class="sp-btn-blue" @click="nextStep(4)" :disabled="!quiz.q4">Далее →</button>
+              </div>
+            </div>
+
+            <div v-if="quizStep === 5" class="sp-quiz-block">
+              <div class="sp-quiz-step-title">
+                <span class="sp-quiz-step-num">5</span>
+                <span>Звукоизоляция</span>
+              </div>
+              <div class="sp-quiz-question">
+                <p class="sp-quiz-q-text">Насколько важна для вас максимальная звукоизоляция?</p>
+                <div class="sp-quiz-options">
+                  <label v-for="opt in q5options" :key="opt" class="sp-quiz-option"
+                    :class="{ selected: quiz.q5 === opt }">
+                    <input type="radio" :value="opt" v-model="quiz.q5" @change="autoNext(5, !!quiz.q5)" />
+                    <span>{{ opt }}</span>
+                  </label>
+                </div>
+              </div>
+              <div class="sp-quiz-nav">
+                <button class="sp-quiz-btn-back" @click="quizStep = 4">← Назад</button>
+                <button class="sp-btn-blue" @click="nextStep(5)" :disabled="!quiz.q5">Далее →</button>
+              </div>
+            </div>
+
+            <div v-if="quizStep === 6" class="sp-quiz-block">
+              <div class="sp-quiz-step-title">
+                <span class="sp-quiz-step-num">6</span>
+                <span>Отделка</span>
+              </div>
+              <div class="sp-quiz-question">
+                <p class="sp-quiz-q-text">Планируете ли вы отделку непосредственно по блокам, без дополнительного
+                  выравнивания?</p>
+                <div class="sp-quiz-options">
+                  <label v-for="opt in q6options" :key="opt" class="sp-quiz-option"
+                    :class="{ selected: quiz.q6 === opt }">
+                    <input type="radio" :value="opt" v-model="quiz.q6" @change="autoNext(6, !!quiz.q6)" />
+                    <span>{{ opt }}</span>
+                  </label>
+                </div>
+              </div>
+              <div class="sp-quiz-nav">
+                <button class="sp-quiz-btn-back" @click="quizStep = 5">← Назад</button>
+                <button class="sp-btn-blue" @click="nextStep(6)" :disabled="!quiz.q6">Далее →</button>
+              </div>
+            </div>
+
+            <div v-if="quizStep === 7" class="sp-quiz-block">
+              <div class="sp-quiz-step-title">
+                <span class="sp-quiz-step-num">7</span>
+                <span>Бюджет</span>
+              </div>
+              <div class="sp-quiz-question">
+                <p class="sp-quiz-q-text">Каков ваш примерный бюджет на материалы для перегородок (за м²)?</p>
                 <div class="sp-quiz-options sp-quiz-options-budget">
                   <label v-for="opt in q7options" :key="opt.label" class="sp-quiz-option sp-quiz-option-budget"
                     :class="{ selected: quiz.q7 === opt.label }">
@@ -455,16 +536,15 @@
                   </label>
                 </div>
               </div>
-
               <div class="sp-quiz-nav">
-                <button class="sp-quiz-btn-back" @click="quizStep = 2">← Назад</button>
-                <button class="sp-btn-blue" @click="nextStep(3)" :disabled="!quiz.q7">Перейти к контактам →</button>
+                <button class="sp-quiz-btn-back" @click="quizStep = 6">← Назад</button>
+                <button class="sp-btn-blue" @click="nextStep(7)" :disabled="!quiz.q7">Перейти к контактам →</button>
               </div>
             </div>
 
-            <div v-if="quizStep === 4" class="sp-quiz-block">
+            <div v-if="quizStep === 8" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
-                <span class="sp-quiz-step-num">4</span>
+                <span class="sp-quiz-step-num" style="background:#22c55e">✓</span>
                 <span>Ваши контакты</span>
               </div>
               <p class="sp-quiz-form-intro">Оставьте контакты — мы свяжемся и составим персональное КП на основе ваших
@@ -500,7 +580,7 @@
                   <label for="consent" class="sp-consent-text">Я согласен с обработкой персональных данных</label>
                 </div>
                 <div class="sp-quiz-nav">
-                  <button type="button" class="sp-quiz-btn-back" @click="quizStep = 3">← Назад</button>
+                  <button type="button" class="sp-quiz-btn-back" @click="quizStep = 7">← Назад</button>
                   <button type="submit" class="sp-btn-blue sp-btn-submit" :disabled="isSubmitting">
                     {{ isSubmitting ? 'Отправляем...' : 'Отправить заявку' }}
                   </button>
@@ -618,10 +698,10 @@
         <div class="sp-footer-tg">
           <h4>Остались вопросы?</h4>
           <p>Свяжитесь с нами по электронной почте или телефону — ответим быстро!</p>
-          <button @click="scrollTo('#contact')" class="sp-btn-tg">
+          <button @click="openQuickModal()" class="sp-btn-tg">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-              <polyline points="22,6 12,13 2,6" />
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
             Написать письмо
           </button>
@@ -645,39 +725,70 @@ const isSubmitting = ref(false)
 const formMessage = ref('')
 const formMessageType = ref('')
 
+const quickModalOpen = ref(false)
+const isQuickSubmitting = ref(false)
+const quickFormMessage = ref('')
+const quickFormMessageType = ref('')
+const quickForm = ref({ name: '', phone: '', consent: false })
+const quickPhoneError = ref('')
+
+const openQuickModal = () => {
+  quickModalOpen.value = true
+  quickForm.value = { name: '', phone: '', consent: false }
+  quickFormMessage.value = ''
+  quickPhoneError.value = ''
+}
+
+const formatQuickPhone = () => {
+  let val = quickForm.value.phone.replace(/\D/g, '')
+  if (val.startsWith('8')) val = '7' + val.slice(1)
+  if (!val.startsWith('7')) val = '7' + val
+  val = val.slice(0, 11)
+  let formatted = '+7'
+  if (val.length > 1) formatted += ' (' + val.slice(1, 4)
+  if (val.length >= 4) formatted += ') ' + val.slice(4, 7)
+  if (val.length >= 7) formatted += '-' + val.slice(7, 9)
+  if (val.length >= 9) formatted += '-' + val.slice(9, 11)
+  quickForm.value.phone = formatted
+  quickPhoneError.value = ''
+}
+
+const submitQuickForm = async () => {
+  if (!quickForm.value.name) { quickFormMessage.value = 'Введите ваше имя'; quickFormMessageType.value = 'error'; return }
+  const digits = quickForm.value.phone.replace(/\D/g, '')
+  if (digits.length !== 11) { quickPhoneError.value = 'Введите корректный номер'; return }
+  if (!quickForm.value.consent) { quickFormMessage.value = 'Согласитесь с обработкой данных'; quickFormMessageType.value = 'error'; return }
+
+  isQuickSubmitting.value = true
+  try {
+    await window.emailjs.send(
+      import.meta.env.VITE_EMAILJS_SERVICE_ID,
+      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+      {
+        from_name: quickForm.value.name,
+        phone: quickForm.value.phone,
+        email: '—',
+        message: '[Быстрая заявка — Узнать стоимость]',
+      }
+    )
+    quickModalOpen.value = false
+    window.location.href = '/thank-you.html'
+  } catch {
+    quickFormMessage.value = 'Ошибка. Позвоните: +7 (925) 275-30-31'
+    quickFormMessageType.value = 'error'
+    isQuickSubmitting.value = false
+  }
+}
+
 const quizStep = ref(1)
 const quiz = ref({ q1: '', q2: '', q3: '', q4: '', q5: '', q6: '', q7: '' })
 
-const q1options = [
-  'Новостройка (квартира, дом)',
-  'Вторичное жильё (квартира, дом)',
-  'Коммерческое помещение (офис, магазин)',
-  'Другое (укажите в комментариях)',
-]
+const q1options = ['Новостройка (квартира, дом)', 'Вторичное жильё (квартира, дом)', 'Коммерческое помещение (офис, магазин)', 'Другое (укажите в комментариях)']
 const q2options = ['До 20 м²', '20–50 м²', 'Более 50 м²']
-const q3options = [
-  'Скорость монтажа',
-  'Прочность и надёжность',
-  'Тепло и звукоизоляция',
-  'Экологичность',
-  'Стоимость',
-  'Простота обработки (резка, штробление)',
-]
-const q4options = [
-  'Да, планирую вешать много и тяжёлого',
-  'Да, но в основном лёгкие предметы',
-  'Нет, не планирую',
-]
-const q5options = [
-  'Очень важна (н-р, для спальни, кабинета)',
-  'Важна, но не критично',
-  'Не имеет большого значения',
-]
-const q6options = [
-  'Да, планирую сразу клеить обои или красить',
-  'Нет, буду штукатурить или использовать гипсокартон',
-  'Пока не определился',
-]
+const q3options = ['Скорость монтажа', 'Прочность и надёжность', 'Тепло и звукоизоляция', 'Экологичность', 'Стоимость', 'Простота обработки']
+const q4options = ['Да, планирую вешать много и тяжёлого', 'Да, но в основном лёгкие предметы', 'Нет, не планирую']
+const q5options = ['Очень важна (н-р, для спальни, кабинета)', 'Важна, но не критично', 'Не имеет большого значения']
+const q6options = ['Да, планирую сразу клеить обои или красить', 'Нет, буду штукатурить или использовать гипсокартон', 'Пока не определился']
 const q7options = [
   { label: 'Эконом', desc: 'Минимальные затраты' },
   { label: 'Стандарт', desc: 'Оптимальное соотношение цена/качество' },
@@ -685,15 +796,17 @@ const q7options = [
 ]
 
 const progressPercent = computed(() => {
-  const map = { 1: 10, 2: 40, 3: 70, 4: 90 }
-  return map[quizStep.value] || 10
+  const map = { 1: 5, 2: 18, 3: 31, 4: 44, 5: 57, 6: 70, 7: 85, 8: 95 }
+  return map[quizStep.value] || 5
 })
 
 const nextStep = (step) => {
   quizStep.value = step + 1
-  setTimeout(() => {
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
-  }, 50)
+  setTimeout(() => { document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }) }, 50)
+}
+
+const autoNext = (step, hasValue) => {
+  if (hasValue) setTimeout(() => nextStep(step), 280)
 }
 
 const form = ref({ name: '', phone: '', email: '', message: '', consent: false })
@@ -716,26 +829,15 @@ const formatPhone = () => {
 
 const validatePhone = () => {
   const digits = form.value.phone.replace(/\D/g, '')
-  if (digits.length !== 11) {
-    phoneError.value = 'Введите корректный номер в формате +7 (XXX) XXX-XX-XX'
-    return false
-  }
-  phoneError.value = ''
-  return true
+  if (digits.length !== 11) { phoneError.value = 'Введите корректный номер в формате +7 (XXX) XXX-XX-XX'; return false }
+  phoneError.value = ''; return true
 }
 
 const validateEmail = () => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
-  if (!re.test(form.value.email)) {
-    emailError.value = 'Введите корректный email, например name@yandex.ru'
-    return false
-  }
-  emailError.value = ''
-  return true
+  if (!re.test(form.value.email)) { emailError.value = 'Введите корректный email, например name@yandex.ru'; return false }
+  emailError.value = ''; return true
 }
-
-const EMAILJS_SERVICE = import.meta.env.VITE_EMAILJS_SERVICE_ID
-const EMAILJS_TEMPLATE = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
 
 const emailCopied = ref(false)
 const copyEmail = () => {
@@ -755,99 +857,24 @@ const observer = new IntersectionObserver((entries) => {
 const observeAll = () => { document.querySelectorAll('.sp-animate:not(.sp-visible)').forEach(el => observer.observe(el)) }
 
 onMounted(() => {
-  if (window.emailjs) {
-    window.emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY)
-  }
-
+  if (window.emailjs) window.emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY)
   window.addEventListener('scroll', handleScroll)
-
-  document.title = 'СтеныПро — Межкомнатные перегородки из ПГП и газобетона в Москве | от 930 ₽/м²'
-
-  const setMeta = (attrs) => {
-    const key = Object.keys(attrs).find(k => k !== 'content')
-    let el = document.querySelector(`meta[${key}="${attrs[key]}"]`)
-    if (!el) { el = document.createElement('meta'); document.head.appendChild(el) }
-    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v))
-  }
-
-  setMeta({ name: 'description', content: 'Возводим межкомнатные перегородки из ПГП и газобетона в Москве и МО. До 50 м² за 1 день, шумоизоляция MaxForte, гарантия 2 года. Бесплатный замер. Цены от 930 ₽/м².' })
-  setMeta({ name: 'keywords', content: 'перегородки из ПГП, газобетонные перегородки, межкомнатные перегородки Москва, кладка перегородок' })
-  setMeta({ name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' })
-  setMeta({ name: 'author', content: 'СтеныПро' })
-  setMeta({ name: 'theme-color', content: '#2563eb' })
-  setMeta({ name: 'geo.region', content: 'RU-MOW' })
-  setMeta({ name: 'geo.placename', content: 'Москва' })
-  setMeta({ name: 'geo.position', content: '55.7558;37.6173' })
-  setMeta({ name: 'ICBM', content: '55.7558, 37.6173' })
-  setMeta({ property: 'og:type', content: 'website' })
-  setMeta({ property: 'og:title', content: 'СтеныПро — Межкомнатные перегородки в Москве от 930 ₽/м²' })
-  setMeta({ property: 'og:description', content: 'Перегородки из ПГП и газобетона до 50 м² за 1 день. Шумоизоляция MaxForte, гарантия 2 года, бесплатный замер.' })
-  setMeta({ property: 'og:url', content: 'https://возведениеперегородок.рф/' })
-  setMeta({ property: 'og:image', content: 'https://stena-pro.vercel.app/2026-02-07%2018.15.09.jpg' })
-  setMeta({ property: 'og:image:width', content: '1200' })
-  setMeta({ property: 'og:image:height', content: '630' })
-  setMeta({ property: 'og:locale', content: 'ru_RU' })
-  setMeta({ property: 'og:site_name', content: 'СтеныПро' })
-  setMeta({ name: 'twitter:card', content: 'summary_large_image' })
-  setMeta({ name: 'twitter:title', content: 'СтеныПро — Межкомнатные перегородки в Москве' })
-  setMeta({ name: 'twitter:description', content: 'Перегородки из ПГП и газобетона до 50 м² за 1 день. Шумоизоляция, гарантия 2 года, бесплатный замер.' })
-  setMeta({ name: 'twitter:image', content: 'https://stena-pro.vercel.app/2026-02-07%2018.15.09.jpg' })
-
-  if (!document.querySelector('link[rel="canonical"]')) {
-    const link = document.createElement('link'); link.rel = 'canonical'
-    link.href = 'https://возведениеперегородок.рф/'; document.head.appendChild(link)
-  }
-
-  if (!document.querySelector('script[type="application/ld+json"]')) {
-    const addSchema = (data) => {
-      const s = document.createElement('script'); s.type = 'application/ld+json'
-      s.textContent = JSON.stringify(data); document.head.appendChild(s)
-    }
-    addSchema({
-      '@context': 'https://schema.org', '@type': 'LocalBusiness',
-      '@id': 'https://возведениеперегородок.рф/#business',
-      name: 'СтеныПро',
-      description: 'Возводим межкомнатные перегородки из ПГП и газобетона в Москве и МО.',
-      url: 'https://возведениеперегородок.рф/', telephone: '+79252753031', email: '89252753031@mail.ru',
-      logo: 'https://stena-pro.vercel.app/logo.jpg', image: 'https://stena-pro.vercel.app/2026-02-07%2018.15.09.jpg',
-      address: { '@type': 'PostalAddress', streetAddress: 'ул. Интернациональная 2, корп. 1, кв. 178', addressLocality: 'Москва', addressRegion: 'Москва', addressCountry: 'RU' },
-      geo: { '@type': 'GeoCoordinates', latitude: 55.7558, longitude: 37.6173 },
-      openingHoursSpecification: { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], opens: '09:00', closes: '21:00' },
-      priceRange: 'от 930 ₽/м²', currenciesAccepted: 'RUB',
-      areaServed: [{ '@type': 'City', name: 'Москва' }, { '@type': 'AdministrativeArea', name: 'Московская область' }],
-      aggregateRating: { '@type': 'AggregateRating', ratingValue: '5', reviewCount: '3', bestRating: '5' },
-    })
-    addSchema({
-      '@context': 'https://schema.org', '@type': 'FAQPage',
-      mainEntity: [
-        { '@type': 'Question', name: 'Нужно ли штукатурить ваши стены?', acceptedAnswer: { '@type': 'Answer', text: 'Да, штукатурка требуется, но слой будет минимальным (5-10 мм). ПГП можно просто шпаклевать.' } },
-        { '@type': 'Question', name: 'Как делаете перемычки над дверями?', acceptedAnswer: { '@type': 'Answer', text: 'Используем металлический уголок толщиной 3 мм или закладную арматуру.' } },
-        { '@type': 'Question', name: 'Вывозите ли вы мусор?', acceptedAnswer: { '@type': 'Answer', text: 'Сбор мусора и уборка включены. Вывоз контейнера оплачивается отдельно.' } }
-      ]
-    })
-  }
-
   observeAll()
   setTimeout(observeAll, 300)
+
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') quickModalOpen.value = false })
 })
 
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
-
+onUnmounted(() => { window.removeEventListener('scroll', handleScroll) })
 watch(activeTab, async () => { await nextTick(); observeAll() })
 
 const scrollTo = (hash) => { document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' }) }
 
 const submitForm = async () => {
-  if (!form.value.name) {
-    formMessage.value = 'Введите ваше имя'; formMessageType.value = 'error'; return
-  }
+  if (!form.value.name) { formMessage.value = 'Введите ваше имя'; formMessageType.value = 'error'; return }
   if (!validatePhone()) return
   if (!validateEmail()) return
-  if (!form.value.consent) {
-    formMessage.value = 'Согласитесь с обработкой данных'; formMessageType.value = 'error'; return
-  }
+  if (!form.value.consent) { formMessage.value = 'Согласитесь с обработкой данных'; formMessageType.value = 'error'; return }
 
   isSubmitting.value = true; formMessage.value = ''
 
@@ -855,22 +882,22 @@ const submitForm = async () => {
 ОТВЕТЫ КВИЗА
 1. Тип помещения: ${quiz.value.q1}
 2. Площадь перегородок: ${quiz.value.q2}
-3. Приоритет при выборе материала: ${quiz.value.q3}
+3. Приоритет: ${quiz.value.q3}
 4. Навесные предметы: ${quiz.value.q4}
-5. Важность звукоизоляции: ${quiz.value.q5}
+5. Звукоизоляция: ${quiz.value.q5}
 6. Отделка по блокам: ${quiz.value.q6}
 7. Бюджет: ${quiz.value.q7}
   `.trim()
 
   try {
-    await window.emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+    await window.emailjs.send(import.meta.env.VITE_EMAILJS_SERVICE_ID, import.meta.env.VITE_EMAILJS_TEMPLATE_ID, {
       from_name: form.value.name,
       phone: form.value.phone,
       email: form.value.email,
       message: (form.value.message ? form.value.message + '\n\n' : '') + quizSummary,
     })
     window.location.href = '/thank-you.html'
-  } catch (err) {
+  } catch {
     formMessage.value = 'Ошибка отправки. Позвоните нам: +7 (925) 275-30-31'
     formMessageType.value = 'error'
     isSubmitting.value = false
@@ -911,6 +938,129 @@ const faq = [
 </script>
 
 <style>
+.sp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 14, 26, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.sp-modal-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px 36px;
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .25);
+  animation: modal-in .3s ease;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(.94) translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sp-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #f3f4f6;
+  border: none;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  transition: background .2s;
+}
+
+.sp-modal-close:hover {
+  background: #e5e7eb;
+}
+
+.sp-modal-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.sp-modal-card h3 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #111827 !important;
+  margin-bottom: 8px;
+}
+
+.sp-modal-card>p {
+  font-size: .875rem;
+  color: #6b7280 !important;
+  line-height: 1.55;
+  margin-bottom: 24px;
+}
+
+.sp-modal-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.sp-modal-field label {
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: 600;
+  font-size: .875rem;
+  color: #111827 !important;
+  margin-bottom: 6px;
+}
+
+.sp-modal-field input {
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif !important;
+  font-size: .9rem;
+  color: #111827 !important;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.sp-modal-field input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity .25s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
 html,
 body {
   margin: 0 !important;
@@ -1213,7 +1363,7 @@ html {
 }
 
 .sp-mmenu.open {
-  max-height: 420px;
+  max-height: 480px;
   opacity: 1;
   padding: 16px 24px 20px;
   border-top-color: var(--border);
@@ -1262,11 +1412,6 @@ html {
   transition: background .2s, transform .15s;
 }
 
-.sp-btn-blue:hover:not(:disabled) {
-  background: var(--blue-dark) !important;
-  color: #fff !important;
-  transform: translateY(-1px);
-}
 
 .sp-btn-blue:disabled {
   opacity: 0.7;
@@ -2985,6 +3130,10 @@ html {
     justify-content: center;
     text-align: center;
   }
+
+  .sp-modal-card {
+    padding: 32px 24px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -3093,5 +3242,23 @@ html {
     opacity: 1;
     animation: none;
   }
+}
+.sp-modal-card button.sp-btn-blue,
+.sp-modal-card button.sp-btn-blue.sp-btn-full {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.sp-modal-card button.sp-btn-blue:hover,
+.sp-modal-card button.sp-btn-blue.sp-btn-full:hover {
+  background-color: #1d4ed8 !important;
+}
+
+.sp-modal-card button.sp-btn-blue:disabled,
+.sp-modal-card button.sp-btn-blue.sp-btn-full:disabled {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
 }
 </style>
