@@ -398,7 +398,6 @@
                 <span>Тип помещения</span>
               </div>
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">Какой тип помещения вы строите или ремонтируете?</p>
                 <div class="sp-quiz-options">
                   <label v-for="opt in q1options" :key="opt" class="sp-quiz-option"
                     :class="{ selected: quiz.q1 === opt }">
@@ -415,11 +414,9 @@
             <div v-if="quizStep === 2" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
                 <span class="sp-quiz-step-num">2</span>
-                <span>Площадь перегородок</span>
+                <span>Где находится объект</span>
               </div>
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">Какова общая площадь перегородок, которые вы планируете возвести (примерно)?
-                </p>
                 <div class="sp-quiz-options">
                   <label v-for="opt in q2options" :key="opt" class="sp-quiz-option"
                     :class="{ selected: quiz.q2 === opt }">
@@ -437,10 +434,9 @@
             <div v-if="quizStep === 3" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
                 <span class="sp-quiz-step-num">3</span>
-                <span>Приоритет при выборе</span>
+                <span>Площадь помещения</span>
               </div>
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">Что для вас наиболее важно при выборе материала для перегородок?</p>
                 <div class="sp-quiz-options sp-quiz-options-grid">
                   <label v-for="opt in q3options" :key="opt" class="sp-quiz-option"
                     :class="{ selected: quiz.q3 === opt }">
@@ -458,11 +454,9 @@
             <div v-if="quizStep === 4" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
                 <span class="sp-quiz-step-num">4</span>
-                <span>Навесные предметы</span>
+                <span>Высота помещения</span>
               </div>
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">Планируете ли вы вешать на перегородки тяжелые предметы (полки, телевизоры,
-                  шкафы)?</p>
                 <div class="sp-quiz-options">
                   <label v-for="opt in q4options" :key="opt" class="sp-quiz-option"
                     :class="{ selected: quiz.q4 === opt }">
@@ -480,10 +474,9 @@
             <div v-if="quizStep === 5" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
                 <span class="sp-quiz-step-num">5</span>
-                <span>Звукоизоляция</span>
+                <span>Наличие проекта</span>
               </div>
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">Насколько важна для вас максимальная звукоизоляция?</p>
                 <div class="sp-quiz-options">
                   <label v-for="opt in q5options" :key="opt" class="sp-quiz-option"
                     :class="{ selected: quiz.q5 === opt }">
@@ -501,11 +494,9 @@
             <div v-if="quizStep === 6" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
                 <span class="sp-quiz-step-num">6</span>
-                <span>Отделка</span>
+                <span>Из каких материалов хотите возводить перегородки</span>
               </div>
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">Планируете ли вы отделку непосредственно по блокам, без дополнительного
-                  выравнивания?</p>
                 <div class="sp-quiz-options">
                   <label v-for="opt in q6options" :key="opt" class="sp-quiz-option"
                     :class="{ selected: quiz.q6 === opt }">
@@ -523,16 +514,14 @@
             <div v-if="quizStep === 7" class="sp-quiz-block">
               <div class="sp-quiz-step-title">
                 <span class="sp-quiz-step-num">7</span>
-                <span>Бюджет</span>
+                <span>Когда желаете начать работы</span>
               </div>
               <div class="sp-quiz-question">
-                <p class="sp-quiz-q-text">Каков ваш примерный бюджет на материалы для перегородок (за м²)?</p>
-                <div class="sp-quiz-options sp-quiz-options-budget">
-                  <label v-for="opt in q7options" :key="opt.label" class="sp-quiz-option sp-quiz-option-budget"
-                    :class="{ selected: quiz.q7 === opt.label }">
-                    <input type="radio" :value="opt.label" v-model="quiz.q7" />
-                    <span class="sp-budget-label">{{ opt.label }}</span>
-                    <span class="sp-budget-desc">{{ opt.desc }}</span>
+                <div class="sp-quiz-options">
+                  <label v-for="opt in q7options" :key="opt" class="sp-quiz-option"
+                    :class="{ selected: quiz.q7 === opt }">
+                    <input type="radio" :value="opt" v-model="quiz.q7" />
+                    <span>{{ opt }}</span>
                   </label>
                 </div>
               </div>
@@ -547,8 +536,6 @@
                 <span class="sp-quiz-step-num" style="background:#22c55e">✓</span>
                 <span>Ваши контакты</span>
               </div>
-              <p class="sp-quiz-form-intro">Оставьте контакты — мы свяжемся и составим персональное КП на основе ваших
-                ответов.</p>
 
               <form @submit.prevent="submitForm" class="sp-contact-form" novalidate>
                 <div class="sp-form-row">
@@ -783,17 +770,13 @@ const submitQuickForm = async () => {
 const quizStep = ref(1)
 const quiz = ref({ q1: '', q2: '', q3: '', q4: '', q5: '', q6: '', q7: '' })
 
-const q1options = ['Новостройка (квартира, дом)', 'Вторичное жильё (квартира, дом)', 'Коммерческое помещение (офис, магазин)', 'Другое (укажите в комментариях)']
-const q2options = ['До 20 м²', '20–50 м²', 'Более 50 м²']
-const q3options = ['Скорость монтажа', 'Прочность и надёжность', 'Тепло и звукоизоляция', 'Экологичность', 'Стоимость', 'Простота обработки']
-const q4options = ['Да, планирую вешать много и тяжёлого', 'Да, но в основном лёгкие предметы', 'Нет, не планирую']
-const q5options = ['Очень важна (н-р, для спальни, кабинета)', 'Важна, но не критично', 'Не имеет большого значения']
-const q6options = ['Да, планирую сразу клеить обои или красить', 'Нет, буду штукатурить или использовать гипсокартон', 'Пока не определился']
-const q7options = [
-  { label: 'Эконом', desc: 'Минимальные затраты' },
-  { label: 'Стандарт', desc: 'Оптимальное соотношение цена/качество' },
-  { label: 'Премиум', desc: 'Готов потратить больше ради лучших характеристик' },
-]
+const q1options = ['Новостройка', 'Вторичка', 'Коммерческое помещение']
+const q2options = ['Моска', 'Московская область']
+const q3options = ['До 30м²', 'До 50м²', 'До 70м²', 'До 90м²', 'Больше 90м²']
+const q4options = ['До 2,7 м', 'До 3 м', 'До 3,5 м', 'До 4 м', 'Выше 4 м']
+const q5options = ['Есть проект', 'Нет проекта', ' Сам сделаю замер и нарисую схему от руки', 'Нужен бесплатный замер']
+const q6options = ['Газобетон', 'Пазогребневая плита(ПГП)', 'Силикатная пазогребневая плита(СПГП)', 'Гипсокартон']
+const q7options = ['В течение недели', 'В течение двух недель', 'В течение месяца']
 
 const progressPercent = computed(() => {
   const map = { 1: 5, 2: 18, 3: 31, 4: 44, 5: 57, 6: 70, 7: 85, 8: 95 }
