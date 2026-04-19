@@ -142,7 +142,7 @@
                 <div>
                   <div class="sp-promo-title">Акция — скидка 10%</div>
                   <div class="sp-promo-text">При заказе кладки <strong>от 100 м²</strong> — скидка <strong>10%</strong>
-                    на работу. Осталось <strong style="color:#fbbf24">3 места</strong> на апрель!</div>
+                    на работу. Осталось <strong style="color:#fbbf24">5 мест</strong> на этот месяц!</div>
                 </div>
               </div>
               <button @click="openQuickModal()" class="sp-btn-tg sp-btn-blue sp-btn-full">
