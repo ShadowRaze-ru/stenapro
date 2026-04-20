@@ -75,6 +75,11 @@
             </svg>
             Telegram
           </a>
+          <a href="https://max.ru/u/f9LHodD0cOIdwjoTOjhiyOz5kLJnqZr-yxvLnGglx15qlNHyvv7Dh7RQoFs" target="_blank"
+            class="sp-btn-max" rel="noopener noreferrer">
+            <img width="18" height="18" src="https://max.ru/s/img/big-logo.png" alt="">
+            MAX
+          </a>
           <button @click="openQuickModal()" class="sp-btn-blue">Замер</button>
         </div>
         <button class="sp-burger" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen" aria-controls="sp-mobile-menu"
@@ -96,6 +101,11 @@
               d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.06-.2-.07-.06-.18-.04-.26-.02-.12.02-2.01 1.28-2.83 1.8-.27.18-.51.27-.73.27-.24 0-.7-.14-1.04-.25-.44-.15-.86-.32-1.24-.48-.41-.17-.45-.41-.07-.65 1.44-.94 3.15-1.87 5.13-2.8 2.44-1.14 2.95-1.34 3.28-1.34.07 0 .23.02.33.13.09.09.12.21.13.29.01.09.02.22-.01.34z" />
           </svg>
           Написать в Telegram
+        </a>
+        <a href="https://max.ru/u/f9LHodD0cOIdwjoTOjhiyOz5kLJnqZr-yxvLnGglx15qlNHyvv7Dh7RQoFs" target="_blank"
+          class="sp-btn-max sp-btn-wa-mob" rel="noopener noreferrer">
+          <img width="18" height="18" src="https://max.ru/s/img/big-logo.png" alt="">
+          Написать в MAX
         </a>
         <button @click="openQuickModal(); menuOpen = false" class="sp-btn-wa sp-btn-wa-mob"
           style="border:none;cursor:pointer;">Узнать стоимость</button>
@@ -1238,6 +1248,31 @@ html {
   background: #316fd2 !important;
   transform: translateY(-1px);
 }
+
+.sp-btn-max {
+  background: #6552ef !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 22px !important;
+  color: #fff !important;
+  border: none;
+  border-radius: 10px;
+  font-size: .8rem;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  text-decoration: none !important;
+  transition: background .2s, transform .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sp-btn-max:hover {
+  background: rgb(109, 79, 207) !important;
+  transform: translateY(-1px);
+}
+
 
 .sp-btn-wa-mob {
   display: flex;
@@ -3226,6 +3261,7 @@ html {
     animation: none;
   }
 }
+
 .sp-modal-card button.sp-btn-blue,
 .sp-modal-card button.sp-btn-blue.sp-btn-full {
   background-color: #2563eb !important;
